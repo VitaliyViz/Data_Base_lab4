@@ -11,6 +11,8 @@ from .orders.animator_service import AnimatorService
 from .orders.event_service import EventService
 from .orders.event_type_service import EventTypeService
 from .orders.animator_agency_service import AnimatorAgencyService
+from .orders.payment_service import PaymentService
+from .orders.order_service import OrderService
 
 # client_service = ClientService()
 # client_type_service = ClientTypeService()
@@ -19,3 +21,5 @@ animator_service = AnimatorService()
 event_service = EventService()
 event_type_service = EventTypeService()
 animator_agency_service = AnimatorAgencyService()
+payment_service = PaymentService()
+order_service = OrderService()

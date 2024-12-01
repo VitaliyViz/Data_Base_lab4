@@ -8,7 +8,12 @@ from abc import ABC
 from typing import List, Dict
 
 from http import HTTPStatus
-from flask import abort
+from flask import abort, Blueprint, request, jsonify
+from my_project.auth.service.general_service import insert_data
+from my_project.auth.service.general_service import add_animator_to_agency
+from my_project.auth.service.general_service import insert_noname_animators
+from my_project.auth.service.general_service import get_column_stat
+from my_project.auth.service.general_service import distribute_animators_data
 
 
 class GeneralController(ABC):
@@ -90,3 +95,104 @@ class GeneralController(ABC):
         Deletes all objects from database table using Service layer.
         """
         self._service.delete_all()
+
+general_controller = Blueprint('general_controller', __name__)
+
+@general_controller.route('/insert', methods=['POST'])
+def insert():
+    """
+    Обробник запиту для вставки даних через збережену процедуру.
+    """
+    data = request.json
+    
+    # Перевірка, чи передані необхідні дані
+    if not data:
+        return jsonify({"error": "Немає даних у запиті"}), 400
+
+    table_name = data.get('table_name')
+    column_list = data.get('column_list')
+    value_list = data.get('value_list')
+
+    # Перевірка, чи всі параметри передані
+    if not table_name or not column_list or not value_list:
+        return jsonify({"error": "Відсутні необхідні параметри"}), 400
+
+    try:
+        # Виклик сервісу для вставки даних
+        insert_data(table_name, column_list, value_list)
+        return jsonify({"message": "Дані успішно вставлено"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+animator_controller = Blueprint('animator_controller', __name__)
+
+@animator_controller.route('/add_animator_to_agency', methods=['POST'])
+def add_animator_to_agency_handler():
+    """
+    Обробник запиту для додавання аніматора до агенції через збережену процедуру.
+    """
+    data = request.json
+
+    if not data:
+        return jsonify({"error": "Немає даних у запиті"}), 400
+
+    animator_name = data.get('animator_name')
+    animator_last_name = data.get('animator_last_name')
+    agency_name = data.get('agency_name')
+
+    if not animator_name or not animator_last_name or not agency_name:
+        return jsonify({"error": "Відсутні необхідні параметри"}), 400
+
+    try:
+        add_animator_to_agency(animator_name, animator_last_name, agency_name)
+        return jsonify({"message": f"Animator '{animator_name} {animator_last_name}' успішно додано до агенції '{agency_name}'."}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+noname_animator_controller = Blueprint('noname_animator_controller', __name__)
+
+@noname_animator_controller.route('/insert_noname_animators', methods=['POST'])
+def insert_noname_animators_route():
+    """
+    Обробник запиту для вставки 10 записів у таблицю animator через збережену процедуру.
+    """
+    try:
+        insert_noname_animators()
+        return jsonify({"message": "10 записів успішно вставлено у таблицю animator."}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+mmas_controller = Blueprint('mmas_controller', __name__)
+
+@mmas_controller.route('/column-stat', methods=['POST'])
+def column_stat():
+    """
+    Обробник запиту для отримання статистики по колонці.
+    """
+    operation = request.json.get('operation')  # MAX, MIN, SUM, AVG
+
+    if not operation or len(operation) > 1000:
+        return jsonify({"error": "Невірна операція або її довжина перевищує 1000 символів"}), 400
+
+    if operation not in ['MAX', 'MIN', 'SUM', 'AVG']:
+        return jsonify({"error": "Невірна операція"}), 400
+
+    try:
+        stat_result = get_column_stat(operation)
+        if stat_result is None:
+            return jsonify({"error": "Не вдалося отримати статистику"}), 500
+        return jsonify({"stat_result": stat_result}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+animator_distribute_controller = Blueprint('animator_distribute_controller', __name__)
+
+@animator_distribute_controller.route('/distribute_animators', methods=['POST'])
+def distribute_animators():
+    """
+    Обробник запиту для розподілу аніматорів у нові таблиці.
+    """
+    try:
+        distribute_animators_data()
+        return jsonify({"message": "Data successfully distributed into new tables!"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500

@@ -11,6 +11,8 @@ from sqlalchemy import inspect
 from sqlalchemy.orm import Mapper
 
 from my_project import db
+import mysql.connector
+from mysql.connector import Error
 
 
 class GeneralDAO(ABC):
@@ -100,3 +102,160 @@ class GeneralDAO(ABC):
         """
         self._session.query(self._domain_type).delete()
         self._session.commit()
+
+#Процедурка для вставки даних у таблиці
+def call_insert_procedure(table_name, column_list, value_list):
+    """
+    Викликає збережену процедуру `insert_into_table` у базі даних MySQL.
+    """
+    connection = None
+    try:
+        connection = mysql.connector.connect(
+            host='localhost',
+            user='root',
+            password='a4b8c11g3',
+            database='lab3'
+        )
+        cursor = connection.cursor()
+
+        procedure_call = "CALL insert_into_table(%s, %s, %s)"
+
+        cursor.execute(procedure_call, (table_name, column_list, value_list))
+        connection.commit()
+        print(f"Дані успішно вставлені в таблицю {table_name}.")
+    
+    except mysql.connector.Error as error:
+        print(f"Помилка під час виклику процедурки: {error}")
+        raise error
+
+    finally:
+
+        if connection and connection.is_connected():
+            cursor.close()
+            connection.close()
+
+def call_add_animator_to_agency(animator_name, animator_last_name, agency_name):
+    """
+    Викликає збережену процедуру AddAnimatorToAgency у базі даних MySQL.
+    """
+    connection = None
+    try:
+        connection = mysql.connector.connect(
+            host='localhost',
+            user='root',
+            password='a4b8c11g3',
+            database='lab3'
+        )
+        cursor = connection.cursor()
+
+        procedure_call = "CALL AddAnimatorToAgency(%s, %s, %s)"
+
+        cursor.execute(procedure_call, (animator_name, animator_last_name, agency_name))
+        connection.commit()
+        print(f"Animator '{animator_name} {animator_last_name}' успішно додано до агенції '{agency_name}'.")
+    
+    except mysql.connector.Error as error:
+        print(f"Помилка під час виклику процедурки: {error}")
+        raise error
+
+    finally:
+        if connection and connection.is_connected():
+            cursor.close()
+            connection.close()
+def call_insert_noname_animators():
+    """
+    Викликає збережену процедуру InsertNonameAnimators у базі даних MySQL.
+    """
+    connection = None
+    try:
+        connection = mysql.connector.connect(
+            host='localhost',
+            user='root',
+            password='a4b8c11g3',
+            database='lab3'
+        )
+        cursor = connection.cursor()
+
+        cursor.execute("CALL InsertNonameAnimators()")
+        connection.commit()
+        print("10 записів успішно вставлено у таблицю animator.")
+    
+    except mysql.connector.Error as error:
+        print(f"Помилка під час виклику процедурки: {error}")
+        raise error
+
+    finally:
+        if connection and connection.is_connected():
+            cursor.close()
+            connection.close()
+import mysql.connector
+
+def call_get_column_stat(operation):
+    """
+    Викликає збережену процедуру CallColumnStat в базі даних MySQL
+    для отримання статистики по колонці.
+    """
+    connection = None
+    try:
+        connection = mysql.connector.connect(
+            host='localhost',
+            user='root',
+            password='a4b8c11g3',
+            database='lab3'
+        )
+        cursor = connection.cursor()
+
+        cursor.callproc('CallColumnStat', [operation])
+
+        for result in cursor.stored_results():
+            stat_result = result.fetchone()
+            return stat_result[0] if stat_result else None
+
+    except mysql.connector.Error as error:
+        print(f"Помилка під час виклику процедури: {error}")
+        raise error
+
+    finally:
+        if connection and connection.is_connected():
+            cursor.close()
+            connection.close()
+import mysql.connector
+from mysql.connector import Error
+
+def create_connection():
+    """
+    Створює з'єднання з базою даних MySQL.
+    """
+    try:
+        connection = mysql.connector.connect(
+            host='localhost',
+            user='root',
+            password='a4b8c11g3',
+            database='lab3'
+        )
+        if connection.is_connected():
+            return connection
+    except Error as e:
+        print(f"Помилка під час підключення до MySQL: {e}")
+        raise
+
+def create_random_animator_tables():
+    """
+    Викликає збережену процедуру для створення таблиць і копіювання даних.
+    """
+    connection = None
+    try:
+        connection = create_connection()
+        cursor = connection.cursor()
+
+        cursor.callproc('CreateRandomAnimatorTablesAndCopyData')
+
+        connection.commit()
+
+    except mysql.connector.Error as error:
+        print(f"Помилка під час виклику процедури: {error}")
+        raise error
+    finally:
+        if connection and connection.is_connected():
+            cursor.close()
+            connection.close()

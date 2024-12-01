@@ -11,6 +11,8 @@ from .orders.animator_controller import AnimatorController
 from .orders.event_controller import EventController
 from .orders.event_type_controller import EventTypeController
 from .orders.animator_agency_controller import AnimatorAgencyController
+from .orders.payment_controller import PaymentController
+from .orders.order_controller import OrderController
 
 
 # client_controller = ClientController()
@@ -20,3 +22,5 @@ animator_controller = AnimatorController()
 event_controller = EventController()
 event_type_controller = EventTypeController()
 animator_agency_controller = AnimatorAgencyController()
+payment_controller = PaymentController()
+order_controller = OrderController()

@@ -12,6 +12,8 @@ from .orders.animator_dao import AnimatorDAO
 from .orders.event_dao import EventDAO
 from .orders.event_type_dao import EventTypeDAO
 from .orders.animator_agency_dao import AnimatorAgencyDAO
+from .orders.payment_dao import PaymentDAO
+from .orders.order_dao import OrderDAO
 
 
 # client_dao = ClientDAO()
@@ -21,3 +23,5 @@ animator_dao = AnimatorDAO()
 event_dao = EventDAO()
 event_type_dao = EventTypeDAO()
 animator_agency_dao = AnimatorAgencyDAO()
+payment_dao = PaymentDAO()
+order_dao = OrderDAO()

@@ -23,6 +23,8 @@ def register_routes(app: Flask) -> None:
     from .orders.event_route import event_bp
     from .orders.event_type_route import event_type_bp
     from .orders.animator_agency_route import animator_agency_bp
+    from .orders.payment_routes import payment_bp
+    from .orders.order_route import order_bp
 
     # app.register_blueprint(client_bp)
     # app.register_blueprint(client_type_bp)
@@ -31,3 +33,5 @@ def register_routes(app: Flask) -> None:
     app.register_blueprint(event_bp)
     app.register_blueprint(event_type_bp)
     app.register_blueprint(animator_agency_bp)
+    app.register_blueprint(payment_bp)
+    app.register_blueprint(order_bp)

@@ -1,15 +1,14 @@
-"""
-2022
-apavelchak@gmail.com
-© Andrii Pavelchak
-"""
-
 import os
-
 from waitress import serve
 import yaml
-
+from flask import Flask
 from my_project import create_app
+from my_project.auth.controller.general_controller import general_controller
+from my_project.auth.service.general_service import insert_data
+from my_project.auth.controller.general_controller import animator_controller
+from my_project.auth.controller.general_controller import noname_animator_controller
+from my_project.auth.controller.general_controller import mmas_controller
+from my_project.auth.controller.general_controller import animator_distribute_controller
 
 DEVELOPMENT_PORT = 5000
 PRODUCTION_PORT = 8080
@@ -18,6 +17,13 @@ DEVELOPMENT = "development"
 PRODUCTION = "production"
 FLASK_ENV = "FLASK_ENV"
 ADDITIONAL_CONFIG = "ADDITIONAL_CONFIG"
+
+def register_blueprints(app):
+    app.register_blueprint(general_controller)
+    app.register_blueprint(animator_controller)
+    app.register_blueprint(noname_animator_controller)
+    app.register_blueprint(mmas_controller)
+    app.register_blueprint(animator_distribute_controller)
 
 if __name__ == '__main__':
     flask_env = os.environ.get(FLASK_ENV, DEVELOPMENT).lower()
@@ -29,11 +35,15 @@ if __name__ == '__main__':
 
         if flask_env == DEVELOPMENT:
             config_data = config_data_dict[DEVELOPMENT]
-            create_app(config_data, additional_config).run(port=DEVELOPMENT_PORT, debug=True)
+            app = create_app(config_data, additional_config)
+            register_blueprints(app) 
+            app.run(port=DEVELOPMENT_PORT, debug=True)
 
         elif flask_env == PRODUCTION:
             config_data = config_data_dict[PRODUCTION]
-            serve(create_app(config_data, additional_config), host=HOST, port=PRODUCTION_PORT)
+            app = create_app(config_data, additional_config)
+            register_blueprints(app)
+            serve(app, host=HOST, port=PRODUCTION_PORT)
 
         else:
             raise ValueError(f"Check OS environment variable '{FLASK_ENV}'")

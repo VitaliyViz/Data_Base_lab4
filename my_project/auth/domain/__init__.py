@@ -7,5 +7,6 @@ from my_project.auth.domain.orders.animator import Animator
 from my_project.auth.domain.orders.animator_agency import  AnimatorAgency
 from my_project.auth.domain.orders.event import  Event
 from my_project.auth.domain.orders.event_type import  EventType
-
+from my_project.auth.domain.orders.payment import Payment
+from my_project.auth.domain.orders.order import Order
 

@@ -6,7 +6,11 @@ apavelchak@gmail.com
 
 from abc import ABC
 from typing import List
-
+from my_project.auth.dao.general_dao import call_insert_procedure
+from my_project.auth.dao.general_dao import call_add_animator_to_agency
+from my_project.auth.dao.general_dao import call_insert_noname_animators
+from my_project.auth.dao.general_dao import call_get_column_stat
+from my_project.auth.dao.general_dao import create_random_animator_tables
 
 class GeneralService(ABC):
     """
@@ -74,3 +78,51 @@ class GeneralService(ABC):
         Deletes all objects from database table using Data Access layer.
         """
         self._dao.delete_all()
+
+def insert_data(table_name, column_list, value_list):
+    """
+    Сервісний рівень для виклику процедури.
+    """
+    try:
+        call_insert_procedure(table_name, column_list, value_list)
+    except Exception as e:
+        print(f"Помилка на рівні сервісу: {e}")
+        raise
+
+def add_animator_to_agency(animator_name, animator_last_name, agency_name):
+    """
+    Сервісний рівень для виклику процедури AddAnimatorToAgency.
+    """
+    try:
+        call_add_animator_to_agency(animator_name, animator_last_name, agency_name)
+    except Exception as e:
+        print(f"Помилка на рівні сервісу: {e}")
+        raise
+def insert_noname_animators():
+    """
+    Сервісний рівень для виклику процедури InsertNonameAnimators.
+    """
+    try:
+        call_insert_noname_animators()
+    except Exception as e:
+        print(f"Помилка на рівні сервісу: {e}")
+        raise
+def get_column_stat(operation):
+    """
+    Сервіс для отримання статистики по колонці з бази даних.
+    """
+    try:
+        return call_get_column_stat(operation)
+    except Exception as e:
+        print(f"Помилка на рівні сервісу: {e}")
+        raise
+
+def distribute_animators_data():
+    """
+    Викликає DAO для розподілу даних у нові таблиці.
+    """
+    try:
+        create_random_animator_tables()
+    except Exception as e:
+        print(f"Помилка на рівні сервісу: {e}")
+        raise
